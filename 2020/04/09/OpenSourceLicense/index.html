@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="GPL,LGPL,Apache License,MIT,BSD,MPL,EPL" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="现在的软件开发，基本上离不开开源软件。但是，各种开源软件使用了形形色色的协议，对使用开源软件设置了各种各样的要求。在使用这些开源软件之前，有必要对这些协议有一些了解，否则很容易陷入一些麻烦。这些开源协议的原文通常是诘屈聱牙，非常难懂。（不要说英文的，我在看一些中文的法律文书，也常常觉得“每个字我都认识，合在一起说的是什么”）。为了以后做技术选型的时候方便，下面我们看看比较流行的开源协议及它们的要求">
+<meta name="keywords" content="GPL,LGPL,Apache License,MIT,BSD,MPL,EPL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="看清楚开源软件的开源协议">
+<meta property="og:url" content="http://www.afrag.wang/2020/04/09/OpenSourceLicense/index.html">
+<meta property="og:site_name" content="昼夜不过是光阴的门户">
+<meta property="og:description" content="现在的软件开发，基本上离不开开源软件。但是，各种开源软件使用了形形色色的协议，对使用开源软件设置了各种各样的要求。在使用这些开源软件之前，有必要对这些协议有一些了解，否则很容易陷入一些麻烦。这些开源协议的原文通常是诘屈聱牙，非常难懂。（不要说英文的，我在看一些中文的法律文书，也常常觉得“每个字我都认识，合在一起说的是什么”）。为了以后做技术选型的时候方便，下面我们看看比较流行的开源协议及它们的要求">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-04-09T02:13:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="看清楚开源软件的开源协议">
+<meta name="twitter:description" content="现在的软件开发，基本上离不开开源软件。但是，各种开源软件使用了形形色色的协议，对使用开源软件设置了各种各样的要求。在使用这些开源软件之前，有必要对这些协议有一些了解，否则很容易陷入一些麻烦。这些开源协议的原文通常是诘屈聱牙，非常难懂。（不要说英文的，我在看一些中文的法律文书，也常常觉得“每个字我都认识，合在一起说的是什么”）。为了以后做技术选型的时候方便，下面我们看看比较流行的开源协议及它们的要求">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.afrag.wang/2020/04/09/OpenSourceLicense/"/>
+
+
+
+
+
+  <title>看清楚开源软件的开源协议 | 昼夜不过是光阴的门户</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">昼夜不过是光阴的门户</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Afrag键盘的回响</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.afrag.wang/2020/04/09/OpenSourceLicense/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Afrag Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="昼夜不过是光阴的门户">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">看清楚开源软件的开源协议</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-09T10:13:08+08:00">
+                2020-04-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/其他/" itemprop="url" rel="index">
+                    <span itemprop="name">其他</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2020/04/09/OpenSourceLicense/" class="leancloud_visitors" data-flag-title="看清楚开源软件的开源协议">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,502
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  5
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>现在的软件开发，基本上离不开开源软件。但是，各种开源软件使用了形形色色的协议，对使用开源软件设置了各种各样的要求。在使用这些开源软件之前，有必要对这些协议有一些了解，否则很容易陷入一些麻烦。这些开源协议的原文通常是诘屈聱牙，非常难懂。（不要说英文的，我在看一些中文的法律文书，也常常觉得“每个字我都认识，合在一起说的是什么”）。为了以后做技术选型的时候方便，下面我们看看比较流行的开源协议及它们的要求。<br><a id="more"></a></p>
+<h1 id="1-GPL"><a href="#1-GPL" class="headerlink" title="1 GPL"></a>1 GPL</h1><p>GPL协议的全称是GNU General Public License，翻译过来是GNU通用公共许可证。</p>
+<p>GPL协议的出发点是“自由软件”，其中的自由是指赋予软件使用者四项基本自由：</p>
+<ul>
+<li>复制自由：允许把软件复制到任何人的电脑上，不限制复制的数量</li>
+<li>传播自由：允许软件以各种形式传播</li>
+<li>收费传播：允许出售软件，但是必须让买家知道这个软件是可以免费获取的。因此，使用GPL的软件都是通过为用户提供服务的方式来收费的。</li>
+<li>修改资源：允许开发人员增加或修改软件的功能，但是软件修改后必须依然基于GPL协议发布。</li>
+</ul>
+<p><strong>只要软件中包含了遵循GPL协议的产品或者代码，那么该软件就必须遵循GPL许可协议，也就是必须开源。因此该协议不适用于商业软件。在商业软件中，也不要使用GPL协议的开源软件。</strong></p>
+<h1 id="2-LGPL"><a href="#2-LGPL" class="headerlink" title="2 LGPL"></a>2 LGPL</h1><p>由于GPL的限制太严格了，因此在GPL的基础上，出现了LGPL(GNU Lesser General Public License)，翻译过来叫做GNU宽通用许可证。所谓宽，就是放宽了限制。</p>
+<p>LGPL允许商业软件通过类库引用的方式使用LGPL软件，不需要开源商业软件的代码。</p>
+<p>但是，如果修改使用LGPL协议的软件的代码，或者衍生使用LGPL协议的软件，则修改的部分和衍生的部分都需要遵循LGPL协议。</p>
+<h1 id="3-BSD"><a href="#3-BSD" class="headerlink" title="3 BSD"></a>3 BSD</h1><p>BSD的全称是Berkeley Software Distribution，意思是“伯克利软件发行版”。<br>BSD开源协议给了使用者非常大的自由，可以自由的使用、修改源代码，或者将修改后的代码作为开源或者专有软件再发布。但是在发布的时候，需要满足3个条件：</p>
+<ul>
+<li>如果发布的产品中包含源代码，则在源代码中必须带有原来代码的BSD协议。</li>
+<li>如果再发布的产品只是二进制类库/软件，则需要在文档和版权声明中包含原来代码中的BSD协议。</li>
+<li>不可以用开源代码的作者/机构名字和原来产品的名字做市场推广。</li>
+</ul>
+<p>因此，<strong>BSD对商业开发很友好，允许商业软件集成和修改使用BSD协议的软件。</strong></p>
+<h1 id="4-Apache-License-2-0"><a href="#4-Apache-License-2-0" class="headerlink" title="4 Apache License 2.0"></a>4 Apache License 2.0</h1><p>Apache许可证是Apache基金会发布的自由软件许可证。该协议和BSD类似，允许源代码修改和再发布(作为商业软件发布)，但是要遵循以下条件：</p>
+<ul>
+<li>需要给代码的用户一份Apache Licence</li>
+<li>如果你修改了代码，需要在被修改的文件中说明。</li>
+<li>在衍生的代码中（修改和有源代码衍生的代码中）需要带有原来代码中的协议，商标，专利声明和其他原来作者规定需要包含的说明。</li>
+<li>如果再发布的产品中包含一个Notice文件，则在Notice文件中需要带有Apache Licence。你可以在Notice中增加自己的许可，但不可以表现为对Apache Licence构成更改。</li>
+</ul>
+<p><strong>Apache License 2.0也是对商业软件十分友好的许可协议，允许对代码进行修改并作为开源或者商业软件发布。</strong></p>
+<h1 id="5-MIT"><a href="#5-MIT" class="headerlink" title="5 MIT"></a>5 MIT</h1><p>没错，MIT就是你所熟知的麻省理工学院(Massachusetts Institute of Technology)。MIT协议又称为X11协议。MIT比BSD更加宽松，这个协议唯一的条件就是在修改后的代码或者发行包中包含原作者的许可信息。</p>
+<p><strong>目前最宽松的开源协议</strong></p>
+<h1 id="6-MPL"><a href="#6-MPL" class="headerlink" title="6 MPL"></a>6 MPL</h1><p>MPL的全称是Mozilla Public License。MPL协议允许自由的修改和重新发布，但是要求修改后的代码版权归软件的发起者。（换句话说，你有修改和发布的自由，但是要贡献版权)。<br><strong>MPL允许修改，可以无偿使用。</strong></p>
+<h1 id="7-EPL"><a href="#7-EPL" class="headerlink" title="7 EPL"></a>7 EPL</h1><p>EPL是Eclipse Publice License的缩写。<br>EPL协议允许任意的使用、复制、分发、传播、展示、修改，并且修改后可以闭源作为商业软件发布。<br>需要遵守的规则是：</p>
+<ul>
+<li>如果修改后，将代码的部分或者整体开源发布，则必须仍然使用EPL协议。</li>
+<li>可以将源码不做任何修改就进行商业发布。但是必须告知客户是可以取得源码的，并且要告知获取方法。</li>
+<li>如果要将使用EPL协议的软件的一部分或者整体和自己的私有代码混合成一个项目发布的时候，可以将整个项目使用其他的协议发布，但是必须要声明那一部分代码是EPL协议下的，并且那部分代码必须继续遵循EPL协议。</li>
+<li>独立的模块不需要开源。</li>
+</ul>
+<h1 id="8-总结"><a href="#8-总结" class="headerlink" title="8 总结"></a>8 总结</h1><p>因此，在我们进行软件开发时，根据自己的目的(商业软件还是开源软件,开源的话希望怎么传播等)，需要看清楚我们要使用的开源软件的协议，否则容易引来麻烦。</p>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ol>
+<li><a href="https://baike.baidu.com/item/%E5%BC%80%E6%BA%90%E5%8D%8F%E8%AE%AE" target="_blank" rel="noopener">百度百科</a></li>
+<li>[菜鸟教程]</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>如果你觉得这篇文章对你有帮助，请鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/afrag-wang-reward.png" alt="Afrag Wang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.png" alt="Afrag Wang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Afrag Wang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://www.afrag.wang/2020/04/09/OpenSourceLicense/" title="看清楚开源软件的开源协议">http://www.afrag.wang/2020/04/09/OpenSourceLicense/</a>
+  </li>
+  
+  
+
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特声明外，均属于作者原创。所有原创文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/开源协议/" rel="tag"># 开源协议</a>
+          
+            <a href="/tags/GPL/" rel="tag"># GPL</a>
+          
+            <a href="/tags/LGPL/" rel="tag"># LGPL</a>
+          
+            <a href="/tags/Apache-License/" rel="tag"># Apache License</a>
+          
+            <a href="/tags/MIT/" rel="tag"># MIT</a>
+          
+            <a href="/tags/BSD/" rel="tag"># BSD</a>
+          
+            <a href="/tags/MPL/" rel="tag"># MPL</a>
+          
+            <a href="/tags/EPL/" rel="tag"># EPL</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/06/DevOpsPractice-10/" rel="next" title="DevOps实践(10) —— DevOps的度量">
+                <i class="fa fa-chevron-left"></i> DevOps实践(10) —— DevOps的度量
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Afrag Wang</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">20</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-GPL"><span class="nav-text">1 GPL</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-LGPL"><span class="nav-text">2 LGPL</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-BSD"><span class="nav-text">3 BSD</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-Apache-License-2-0"><span class="nav-text">4 Apache License 2.0</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-MIT"><span class="nav-text">5 MIT</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-MPL"><span class="nav-text">6 MPL</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-EPL"><span class="nav-text">7 EPL</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#8-总结"><span class="nav-text">8 总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考文献"><span class="nav-text">参考文献</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Afrag Wang</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">21.9k</span>
+  
+</div>
+
+
+
+
+
+
+
+
+  <div class="footer-custom">Afrag个人博客</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("vGiChtlnP07wcVG2GfTwcs1L-gzGzoHsz", "INv1WrjzQC8mK5PH17l4RCo3");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
