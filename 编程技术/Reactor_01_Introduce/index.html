@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Reactor,Reactive Programming,响应式编程" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Reactor是响应式编程(Reactive Programming)的实现。总体来说，响应式编程是一种异步编程范式，它关注的是数据流和变化的传播。因此，支持响应式编程的语言能够很容易的表达静态数据流（例如数组）和动态数据流（例如事件发射器）。">
+<meta name="keywords" content="Reactor,Reactive Programming,响应式编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Project Reactor教程(1) —— Reactor简介">
+<meta property="og:url" content="http://www.afrag.wang/编程技术/Reactor_01_Introduce/index.html">
+<meta property="og:site_name" content="昼夜不过是光阴的门户">
+<meta property="og:description" content="Reactor是响应式编程(Reactive Programming)的实现。总体来说，响应式编程是一种异步编程范式，它关注的是数据流和变化的传播。因此，支持响应式编程的语言能够很容易的表达静态数据流（例如数组）和动态数据流（例如事件发射器）。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-04-10T02:03:05.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Project Reactor教程(1) —— Reactor简介">
+<meta name="twitter:description" content="Reactor是响应式编程(Reactive Programming)的实现。总体来说，响应式编程是一种异步编程范式，它关注的是数据流和变化的传播。因此，支持响应式编程的语言能够很容易的表达静态数据流（例如数组）和动态数据流（例如事件发射器）。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.afrag.wang/编程技术/Reactor_01_Introduce/"/>
+
+
+
+
+
+  <title>Project Reactor教程(1) —— Reactor简介 | 昼夜不过是光阴的门户</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">昼夜不过是光阴的门户</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Afrag键盘的回响</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.afrag.wang/编程技术/Reactor_01_Introduce/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Afrag Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="昼夜不过是光阴的门户">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Project Reactor教程(1) —— Reactor简介</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-10T10:03:05+08:00">
+                2020-04-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程技术/" itemprop="url" rel="index">
+                    <span itemprop="name">编程技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/编程技术/Reactor_01_Introduce/" class="leancloud_visitors" data-flag-title="Project Reactor教程(1) —— Reactor简介">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2,546
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  10
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Reactor是响应式编程(Reactive Programming)的实现。总体来说，响应式编程是一种异步编程范式，它关注的是数据流和变化的传播。因此，支持响应式编程的语言能够很容易的表达静态数据流（例如数组）和动态数据流（例如事件发射器）。</p>
+<a id="more"></a>
+<h2 id="1-1-历史"><a href="#1-1-历史" class="headerlink" title="1.1 历史"></a>1.1 历史</h2><p>最开始的响应式编程是微软创建的Reactive Extensions(Rx)库，是属于.NET生态系统的。然后，RxJava将Rx移植到了JVM上。</p>
+<p>基于RxJava等在JVM上实现Reactive Programming的实践，Reactive Stream提出了在JVM上实现响应式编程的标准，这是一套定义了一组接口和互动规则的规范。这套规范的接口在Java 9中被集成到了Flow类中。</p>
+<h2 id="1-2-Reactive-Programming"><a href="#1-2-Reactive-Programming" class="headerlink" title="1.2 Reactive Programming"></a>1.2 Reactive Programming</h2><p>响应式编程在面向对象的语言中通常表现为观察者设计模式的扩展。同时，Reactive Stream模式和Iterator设计模式又有点相似，不同的Iterator是pull方式，也就是消费者主动从Iterator中读取数据，而reactive programming是push方式，分为publisher和subscriber（发布者和订阅者），由发布者通知订阅者有新的数据了。这种push方式是响应的关键。</p>
+<p>同时，在被推送的值上的操作也是表示为声明式的，而不是命令式的：程序员表示的是对这个值的计算逻辑，而不是描述确切的控制流程。</p>
+<p>在Reactive Stream中，对错误处理以及流结束的处理也做了规定。发布者通过调用onNext来将新的值push给订阅者，也可以通过调用onError来向订阅者发送错误，或者调用onComplete向订阅者表明流结束了。Error和Completion都会终止整个流序列。因此整个流可以表示如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">onNext x 0..N [onError | onComplete]</span><br></pre></td></tr></table></figure></p>
+<p>也就是一个流中可以包含0个或多个onNext调用，最后在onError或onComplete中结束，也有可能流一直不结束。这种模式支持0个、1个、多个甚至无穷个数据。</p>
+<h2 id="1-3-阻塞方式和异步方式"><a href="#1-3-阻塞方式和异步方式" class="headerlink" title="1.3 阻塞方式和异步方式"></a>1.3 阻塞方式和异步方式</h2><p>Reactive Stream使用的是异步模式。<br>现代的软件可能会有大量的并发用户和请求，现代的硬件的能力也在不断的提升，但是软件的性能还是关键的关注点。</p>
+<p>要提高性能，有两种方式：</p>
+<ol>
+<li>通过并行来是使用更多的线程和更多的资源。</li>
+<li>寻求方法来更有效的利用现有的资源。</li>
+</ol>
+<p>阻塞方式会造成资源的浪费，尤其是在IO密集的软件中。就算是使用大量的线程，也会有很多线程因为等待数据而闲置。</p>
+<p>异步就是更有效利用现有资源的方法。异步的、非阻塞的代码，会让程序在等待数据时切换到其他的任务中，等到数据到达时再切换回来。</p>
+<p>Java中提供了两种方式来实现异步编程：</p>
+<ul>
+<li>回调： 异步的方法并不返回值，而是有一个额外的回调参数（通常是一个lamda函数或者匿名类)，当结果准备好的时候，这个回调参数会被调用。</li>
+<li>Future：异步方法立刻返回一个Feture<t>。 实际上异步方法运算的结果是一个 <code>T</code> 类型的值，但是使用<code>Future</code>对其进行了封装。调用方可以通过轮询Future对象提供的方法来查看计算结果是否准备好了。</t></li>
+</ul>
+<p>但是，这两种方式都有局限性，并不能满足所有场景的需要。</p>
+<p>回调的方式很难组合，很容易出现难以阅读和维护的代码，被程序员称为“回调地狱”。</p>
+<p>例如，我们要在界面上显示一个用户的爱好（显示5条）。如果用户没有爱好，则显示对该用户的推荐。如果采用回调的方式，代码大概如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">userService.getFavorites(userId, <span class="keyword">new</span> Callback&lt;List&lt;String&gt;&gt;() &#123; </span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onSuccess</span><span class="params">(List&lt;String&gt; list)</span> </span>&#123; </span><br><span class="line">    <span class="keyword">if</span> (list.isEmpty()) &#123; </span><br><span class="line">      suggestionService.getSuggestions(<span class="keyword">new</span> Callback&lt;List&lt;Favorite&gt;&gt;() &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onSuccess</span><span class="params">(List&lt;Favorite&gt; list)</span> </span>&#123; </span><br><span class="line">          UiUtils.submitOnUiThread(() -&gt; &#123; </span><br><span class="line">            list.stream()</span><br><span class="line">                .limit(<span class="number">5</span>)</span><br><span class="line">                .forEach(uiList::show); </span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onError</span><span class="params">(Throwable error)</span> </span>&#123; </span><br><span class="line">          UiUtils.errorPopup(error);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      list.stream() </span><br><span class="line">          .limit(<span class="number">5</span>)</span><br><span class="line">          .forEach(favId -&gt; favoriteService.getDetails(favId, </span><br><span class="line">            <span class="keyword">new</span> Callback&lt;Favorite&gt;() &#123;</span><br><span class="line">              <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onSuccess</span><span class="params">(Favorite details)</span> </span>&#123;</span><br><span class="line">                UiUtils.submitOnUiThread(() -&gt; uiList.show(details));</span><br><span class="line">              &#125;</span><br><span class="line"></span><br><span class="line">              <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onError</span><span class="params">(Throwable error)</span> </span>&#123;</span><br><span class="line">                UiUtils.errorPopup(error);</span><br><span class="line">              &#125;</span><br><span class="line">            &#125;</span><br><span class="line">          ));</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onError</span><span class="params">(Throwable error)</span> </span>&#123;</span><br><span class="line">    UiUtils.errorPopup(error);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>如果采用Reactor的方式的话，代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">userService.getFavorites(userId) </span><br><span class="line">           .flatMap(favoriteService::getDetails) </span><br><span class="line">           .switchIfEmpty(suggestionService.getSuggestions()) </span><br><span class="line">           .take(<span class="number">5</span>) </span><br><span class="line">           .publishOn(UiUtils.uiThreadScheduler()) </span><br><span class="line">           .subscribe(uiList::show, UiUtils::errorPopup);</span><br></pre></td></tr></table></figure></p>
+<p>是不是要简洁明了的多？</p>
+<p>同样的，使用Future也存在一些缺陷。尽管在Java 8中提供了CompletableFuture作了一些改进，但是在组合方面，做得还是不够好。对多个Future进行编排是可以的，但是做起来不容易。Future同时还存在下面的问题：</p>
+<ul>
+<li>在调用get()方法的时候，还是可能出现阻塞。</li>
+<li>不支持延迟计算</li>
+<li>不支持多个值以及错误处理</li>
+</ul>
+<p>我们来看看下面这个例子：我们有一组id，我们需要根据这组id获取对应的名字以及统计信息，并把这些信息成对的匹配起来。所有这些操作都需要是异步的。</p>
+<p>如果要使用CompletableFuture，代码如下面的例子所示：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">CompletableFuture&lt;List&lt;String&gt;&gt; ids = ifhIds(); </span><br><span class="line"></span><br><span class="line">CompletableFuture&lt;List&lt;String&gt;&gt; result = ids.thenComposeAsync(l -&gt; &#123; </span><br><span class="line">	Stream&lt;CompletableFuture&lt;String&gt;&gt; zip =</span><br><span class="line">			l.stream().map(i -&gt; &#123; </span><br><span class="line">				CompletableFuture&lt;String&gt; nameTask = ifhName(i); </span><br><span class="line">				CompletableFuture&lt;Integer&gt; statTask = ifhStat(i); </span><br><span class="line"></span><br><span class="line">				<span class="keyword">return</span> nameTask.thenCombineAsync(statTask, (name, stat) -&gt; <span class="string">"Name "</span> + name + <span class="string">" has stats "</span> + stat); </span><br><span class="line">			&#125;);</span><br><span class="line">	List&lt;CompletableFuture&lt;String&gt;&gt; combinationList = zip.collect(Collectors.toList()); </span><br><span class="line">	CompletableFuture&lt;String&gt;[] combinationArray = combinationList.toArray(<span class="keyword">new</span> CompletableFuture[combinationList.size()]);</span><br><span class="line"></span><br><span class="line">	CompletableFuture&lt;Void&gt; allDone = CompletableFuture.allOf(combinationArray); </span><br><span class="line">	<span class="keyword">return</span> allDone.thenApply(v -&gt; combinationList.stream()</span><br><span class="line">			.map(CompletableFuture::join) </span><br><span class="line">			.collect(Collectors.toList()));</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">List&lt;String&gt; results = result.join(); </span><br><span class="line">assertThat(results).contains(</span><br><span class="line">		<span class="string">"Name NameJoe has stats 103"</span>,</span><br><span class="line">		<span class="string">"Name NameBart has stats 104"</span>,</span><br><span class="line">		<span class="string">"Name NameHenry has stats 105"</span>,</span><br><span class="line">		<span class="string">"Name NameNicole has stats 106"</span>,</span><br><span class="line">		<span class="string">"Name NameABSLAJNFOAJNFOANFANSF has stats 121"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>如果使用Reactor的话，代码则要简洁的多：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">Flux&lt;String&gt; ids = ifhrIds(); </span><br><span class="line"></span><br><span class="line">Flux&lt;String&gt; combinations =</span><br><span class="line">		ids.flatMap(id -&gt; &#123; </span><br><span class="line">			Mono&lt;String&gt; nameTask = ifhrName(id); </span><br><span class="line">			Mono&lt;Integer&gt; statTask = ifhrStat(id); </span><br><span class="line"></span><br><span class="line">			<span class="keyword">return</span> nameTask.zipWith(statTask, </span><br><span class="line">					(name, stat) -&gt; <span class="string">"Name "</span> + name + <span class="string">" has stats "</span> + stat);</span><br><span class="line">		&#125;);</span><br><span class="line"></span><br><span class="line">Mono&lt;List&lt;String&gt;&gt; result = combinations.collectList(); </span><br><span class="line"></span><br><span class="line">List&lt;String&gt; results = result.block(); </span><br><span class="line">assertThat(results).containsExactly( </span><br><span class="line">		<span class="string">"Name NameJoe has stats 103"</span>,</span><br><span class="line">		<span class="string">"Name NameBart has stats 104"</span>,</span><br><span class="line">		<span class="string">"Name NameHenry has stats 105"</span>,</span><br><span class="line">		<span class="string">"Name NameNicole has stats 106"</span>,</span><br><span class="line">		<span class="string">"Name NameABSLAJNFOAJNFOANFANSF has stats 121"</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure></p>
+<h2 id="1-4-响应式编程"><a href="#1-4-响应式编程" class="headerlink" title="1.4 响应式编程"></a>1.4 响应式编程</h2><p>像Reactor这样的响应式的库，除了要解决前面Callback和Future的不足之处外，还有其他的一些好处。</p>
+<h3 id="1-4-1-可组合性和可读性"><a href="#1-4-1-可组合性和可读性" class="headerlink" title="1.4.1 可组合性和可读性"></a>1.4.1 可组合性和可读性</h3><p>可组合性(composability)指的是能够编排多个异步任务的能力，我可以将前一个任务的输出作为后一个任务的输入，也可以使用fork-join的凡是运行几个任务。我们还可以在高层级的系统中将异步任务作为离散的组件来重用。</p>
+<p>在复杂的业务处理中，异步操作的层级越来越多，在这种情况下，可组合性可以带来很好的可读性。因为可组合型能够尽量让代码处于同一个层级，减少嵌套。</p>
+<h3 id="1-4-2-和流水线的类比"><a href="#1-4-2-和流水线的类比" class="headerlink" title="1.4.2 和流水线的类比"></a>1.4.2 和流水线的类比</h3><p>可以把数据被响应式应用处理的过程想象成产品从流水线上移动的过程。Reactor同时扮演了传送带和工作台的角色。原材料（原始数据）从最初的Publisher中出来，最终变成完成后的、可以提送给消费者（Subscriber）的产品。</p>
+<p>原材料可能会经过多次变化，可能有很多中间步骤，或者这个流水线是将多个中间产品组合成最终产品的更大的流水线的一部分。</p>
+<p>在这个流水线上，如果有任何的一个地方出现了故障或者卡顿，都需要通知上游系统或上游的步骤进行限流。</p>
+<h3 id="1-4-3-Operator"><a href="#1-4-3-Operator" class="headerlink" title="1.4.3 Operator"></a>1.4.3 Operator</h3><p>在Reactor中，Operator就是流水线中的工作台。每个operator都会向Publisher中增加新的行为，并将旧的Publisher封装为一个新的Publisher。这样就将多个operator连接成一个链条。数据从第一个Publisher中出来后，沿着链条移动，被一个个operator处理。最后，到达链条的终点 —— 一个Subscriber。</p>
+<p>需要强调的是，<strong>在Subscriber向Publisher订阅之前，什么都不会发生。</strong></p>
+<h3 id="1-4-4-由Subscriber触发数据流动"><a href="#1-4-4-由Subscriber触发数据流动" class="headerlink" title="1.4.4 由Subscriber触发数据流动"></a>1.4.4 由Subscriber触发数据流动</h3><p>在Reactor中，当在编写Publisher链条的时候，默认不会立刻向这个链条中注入数据。这个时候，我们只是创建了一个异步处理过程的描述，这种方式有利于重用和组合。</p>
+<p>通过订阅，我们将Publisher和Subscriber连接在一起，这个时候才触发数据在整个链条中的流动。这个的实现方式是由Subscriber向Publisher发送一个request信号，该信号一直向上游传播，直到到达最初的Publisher为止。</p>
+<h3 id="1-4-5-回压"><a href="#1-4-5-回压" class="headerlink" title="1.4.5 回压"></a>1.4.5 回压</h3><p>回压(back-pressure)有时候也被叫做反压，就是我们前面提到的当流水线上的某个工作台出现了问题的时候，要通知上游系统进行限流的过程。在Reactor中，这个过程也是通过上一节提到的向上游传递信号的机制来实现的。</p>
+<p>在Reactive Stream规范中定义中，一个Subscriber可以是“不限速”的，也就是可以让publisher以所能达到的最快的速度发送所有的数据。Subscriber也可以使用request机制来通知publisher说已经准备好处理最多n个数据。</p>
+<p>这种方式让push模式变成了push-pull混合模式。如果数据已经准备好了，下游系统可以pull指定数量的数据。如果数据还没有准备好，那么一旦准备好就会被push到下游系统。</p>
+<p>中间的operator可能会改变request。例如buffer，假设buffer这个operator将10个数据组成一组，那么下游系统要求处理一个buffer的时候，buffer会向上游系统要求10个数据。</p>
+<h3 id="1-4-6-Hot-和-Cold"><a href="#1-4-6-Hot-和-Cold" class="headerlink" title="1.4.6 Hot 和 Cold"></a>1.4.6 Hot 和 Cold</h3><p><strong><em>没有看得太明白，回头再细看</em></strong></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>如果你觉得这篇文章对你有帮助，请鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/afrag-wang-reward.png" alt="Afrag Wang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.png" alt="Afrag Wang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Afrag Wang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://www.afrag.wang/编程技术/Reactor_01_Introduce/" title="Project Reactor教程(1) —— Reactor简介">http://www.afrag.wang/编程技术/Reactor_01_Introduce/</a>
+  </li>
+  
+  
+
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特声明外，均属于作者原创。所有原创文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Reactive-Programming/" rel="tag"># Reactive Programming</a>
+          
+            <a href="/tags/响应式编程/" rel="tag"># 响应式编程</a>
+          
+            <a href="/tags/Ractor/" rel="tag"># Ractor</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/其他/OpenSourceLicense/" rel="next" title="看清楚开源软件的开源协议">
+                <i class="fa fa-chevron-left"></i> 看清楚开源软件的开源协议
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Afrag Wang</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-历史"><span class="nav-text">1.1 历史</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-Reactive-Programming"><span class="nav-text">1.2 Reactive Programming</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-阻塞方式和异步方式"><span class="nav-text">1.3 阻塞方式和异步方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-4-响应式编程"><span class="nav-text">1.4 响应式编程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-1-可组合性和可读性"><span class="nav-text">1.4.1 可组合性和可读性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-2-和流水线的类比"><span class="nav-text">1.4.2 和流水线的类比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-3-Operator"><span class="nav-text">1.4.3 Operator</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-4-由Subscriber触发数据流动"><span class="nav-text">1.4.4 由Subscriber触发数据流动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-5-回压"><span class="nav-text">1.4.5 回压</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-6-Hot-和-Cold"><span class="nav-text">1.4.6 Hot 和 Cold</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Afrag Wang</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">24.4k</span>
+  
+</div>
+
+
+
+
+
+
+
+
+  <div class="footer-custom">Afrag个人博客</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("vGiChtlnP07wcVG2GfTwcs1L-gzGzoHsz", "INv1WrjzQC8mK5PH17l4RCo3");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
