@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="协程,corountine" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="要理解协程(corountine)，需要首先对进程(process)和线程(thread)有所了解。如果你对进程和线程有所了解，可以直接阅读第三章。如果没有了解也没有关系，可以花费几分钟先看看前两章。">
+<meta name="keywords" content="协程,corountine">
+<meta property="og:type" content="article">
+<meta property="og:title" content="初步理解协程">
+<meta property="og:url" content="http://www.afrag.wang/计算机科学/CS-coroutine-introduce/index.html">
+<meta property="og:site_name" content="昼夜不过是光阴的门户">
+<meta property="og:description" content="要理解协程(corountine)，需要首先对进程(process)和线程(thread)有所了解。如果你对进程和线程有所了解，可以直接阅读第三章。如果没有了解也没有关系，可以花费几分钟先看看前两章。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-02-27T02:03:05.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="初步理解协程">
+<meta name="twitter:description" content="要理解协程(corountine)，需要首先对进程(process)和线程(thread)有所了解。如果你对进程和线程有所了解，可以直接阅读第三章。如果没有了解也没有关系，可以花费几分钟先看看前两章。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.afrag.wang/计算机科学/CS-coroutine-introduce/"/>
+
+
+
+
+
+  <title>初步理解协程 | 昼夜不过是光阴的门户</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">昼夜不过是光阴的门户</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Afrag键盘的回响</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.afrag.wang/计算机科学/CS-coroutine-introduce/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Afrag Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="昼夜不过是光阴的门户">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">初步理解协程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-27T10:03:05+08:00">
+                2020-02-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/计算机科学/" itemprop="url" rel="index">
+                    <span itemprop="name">计算机科学</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/计算机科学/CS-coroutine-introduce/" class="leancloud_visitors" data-flag-title="初步理解协程">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,252
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  4
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>要理解协程(corountine)，需要首先对进程(process)和线程(thread)有所了解。如果你对进程和线程有所了解，可以直接阅读第三章。如果没有了解也没有关系，可以花费几分钟先看看前两章。<br><a id="more"></a></p>
+<h2 id="1-进程"><a href="#1-进程" class="headerlink" title="1. 进程"></a>1. 进程</h2><p>对于人来说，一个进程就是一个正在运行的程序。比如word应用程序、浏览器等等。对于操作系统来说，一个进程中应该包括：</p>
+<ul>
+<li>程序的代码</li>
+<li>程序的数据<br>CPU寄存器的值，包括通用寄存器，程序计数器<br>堆(heap)，用来保存进程运行时动态分配的内存空间<br>栈(stack)，保存运行的上下文信息，以及在函数调用时保存被调用函数的形式参数和局部变量<br>进程所占用的系统资源，比如打开的文件等等<br>不必对这些概念追根问底，只需要有一个概念，对于操作系统来说，一个进程中包含了很多的东西，这些东西都是用于对资源的组织和程序的执行。</li>
+</ul>
+<p>由于一个进程包含的东西较多，在操作系统进行进程间的切换的时候，需要的开销是很大的。</p>
+<h2 id="2-线程"><a href="#2-线程" class="headerlink" title="2. 线程"></a>2. 线程</h2><p>在没有线程的时候，进程中的程序代码是顺序执行的。这种方式在很多情况下是不方便的。例如我们使用的word有一个功能是自动保存。如果没有线程，在word进行自动保存的时候（假设文件很大，需要3秒钟保存），在3秒钟期间，我从键盘上输入的文字不会得到任何响应（想象一下死机的感觉），这个用户体验是很差的。</p>
+<p>因此，引入了线程的概念。一个进程中可以包含多个线程，这些线程可以共享进程中的大多数资源，但是线程也有一些自己的资源，这些线程独有的资源包括：</p>
+<ul>
+<li>栈</li>
+<li>CPU寄存器</li>
+<li>程序计数器<br>可以看到，线程所独占的资源相对进程来说小了很多，在线程间的切换开销也要小很多。</li>
+</ul>
+<h2 id="3-协程"><a href="#3-协程" class="headerlink" title="3. 协程"></a>3. 协程</h2><p>进程和线程都是操作系统级别的，操作系统为进程和线程提供支持，也知道所有的进程和线程的存在，进程和线程的调度都是由操作系统控制的。但是协程和这两者都不一样。</p>
+<p>协程是一种用户态的轻量级线程，协程的调度完全由用户控制。敲黑板、画重点：协程的调度完全是由用户控制的。这里的用户指的不是使用应用程序的人，而是编写应用程序的人。</p>
+<p>协程也有自己的资源，包括寄存器上下文和栈。协程调度切换的时候，将寄存器上下文和栈保存到其他地方，在切换回来时再恢复。</p>
+<p>协程的切换是在线程中实现的，因此不需要内核级别的上下文切换，避免了这一部分的开销。</p>
+<p>协程中不需要多线程的锁机制，在协程中控制共享资源（线程中的共享资源）不需要加锁，只需要判断状态就好。</p>
+<h2 id="4-协程和多线程的使用场景"><a href="#4-协程和多线程的使用场景" class="headerlink" title="4. 协程和多线程的使用场景"></a>4. 协程和多线程的使用场景</h2><p>所有的进程、线程、协程这些概念，都是为了尽量利用CPU的性能。因为CPU的速度是远高于其他的设备（例如内存、外存等等）的。</p>
+<p>进程和线程都是同步机制，是由操作系统控制的；协程是异步机制，是由用户自己控制的。它们适应的场景是有差别的。</p>
+<h3 id="4-1-多核CPU，CPU密集型应用"><a href="#4-1-多核CPU，CPU密集型应用" class="headerlink" title="4.1 多核CPU，CPU密集型应用"></a>4.1 多核CPU，CPU密集型应用</h3><p>如果是多核CPU，并且是CPU密集型的应用，则采用多线程比较合适。多线程可以充分利用多核CPU的处理核心，又避免了协程切换开销（虽然小，但是还是有）带来的性能损失。</p>
+<h3 id="4-2-多核CPU，IO密集型应用"><a href="#4-2-多核CPU，IO密集型应用" class="headerlink" title="4.2 多核CPU，IO密集型应用"></a>4.2 多核CPU，IO密集型应用</h3><p>对于多核CPU，IO密集型的应用，采用多线程，每个线程多个协程。对于每一个CPU核心一个线程，多个协程可以充分利用单个核心的能力，不需要在等待IO操作的时候闲置CPU。</p>
+<h3 id="4-3-单核CPU，CPU密集型应用"><a href="#4-3-单核CPU，CPU密集型应用" class="headerlink" title="4.3 单核CPU，CPU密集型应用"></a>4.3 单核CPU，CPU密集型应用</h3><p>对于单核CPU，并且是CPU密集型的应用，单进程效率最高。</p>
+<h3 id="4-4-单核CPU，IO密集型应用"><a href="#4-4-单核CPU，IO密集型应用" class="headerlink" title="4.4 单核CPU，IO密集型应用"></a>4.4 单核CPU，IO密集型应用</h3><p>对于单核CPU，IO密集型的应用，采用单进程，多协程效率最高。</p>
+<h2 id="5-其他"><a href="#5-其他" class="headerlink" title="5. 其他"></a>5. 其他</h2><p>在Windows系统中，协程(coroutine)叫着纤程(Fiber)，实际的概念是一样的。</p>
+<p>目前很多语言都提供了对协程的支撑，例如python。Java还没有提供对协程的官方支持，只能依赖一些第三方库实施。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>如果你觉得这篇文章对你有帮助，请鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/afrag-wang-reward.png" alt="Afrag Wang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.png" alt="Afrag Wang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Afrag Wang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://www.afrag.wang/计算机科学/CS-coroutine-introduce/" title="初步理解协程">http://www.afrag.wang/计算机科学/CS-coroutine-introduce/</a>
+  </li>
+  
+  
+
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特声明外，均属于作者原创。所有原创文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/协程-corountine/" rel="tag"># 协程,corountine</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/其他/first/" rel="next" title="开博了">
+                <i class="fa fa-chevron-left"></i> 开博了
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/程序开发/Java-knowledge-supplement-1/" rel="prev" title="我的Java知识补遗(1) —— Java语言基础">
+                我的Java知识补遗(1) —— Java语言基础 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Afrag Wang</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">20</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-进程"><span class="nav-text">1. 进程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-线程"><span class="nav-text">2. 线程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-协程"><span class="nav-text">3. 协程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-协程和多线程的使用场景"><span class="nav-text">4. 协程和多线程的使用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-多核CPU，CPU密集型应用"><span class="nav-text">4.1 多核CPU，CPU密集型应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-多核CPU，IO密集型应用"><span class="nav-text">4.2 多核CPU，IO密集型应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-单核CPU，CPU密集型应用"><span class="nav-text">4.3 单核CPU，CPU密集型应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-单核CPU，IO密集型应用"><span class="nav-text">4.4 单核CPU，IO密集型应用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-其他"><span class="nav-text">5. 其他</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Afrag Wang</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">21.9k</span>
+  
+</div>
+
+
+
+
+
+
+
+
+  <div class="footer-custom">Afrag个人博客</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("vGiChtlnP07wcVG2GfTwcs1L-gzGzoHsz", "INv1WrjzQC8mK5PH17l4RCo3");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

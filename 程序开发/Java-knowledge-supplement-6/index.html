@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java14" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="这里的stream指的是java.util.stream包。Stream用于代表任意Java对象的序列，顺序输出任意Java对象实例，并且这个对象实例可能不是预先存在的，而是实时计算出来的。 Stream是惰性计算的，也就是在存储和转换的过程中，并不进行计算，而是存储计算规则。只有最后获取结果的时候才计算（类似Spark中的RDD）。">
+<meta name="keywords" content="Java14">
+<meta property="og:type" content="article">
+<meta property="og:title" content="我的Java知识补遗(6) —— Stream">
+<meta property="og:url" content="http://www.afrag.wang/程序开发/Java-knowledge-supplement-6/index.html">
+<meta property="og:site_name" content="昼夜不过是光阴的门户">
+<meta property="og:description" content="这里的stream指的是java.util.stream包。Stream用于代表任意Java对象的序列，顺序输出任意Java对象实例，并且这个对象实例可能不是预先存在的，而是实时计算出来的。 Stream是惰性计算的，也就是在存储和转换的过程中，并不进行计算，而是存储计算规则。只有最后获取结果的时候才计算（类似Spark中的RDD）。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-03-09T02:13:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="我的Java知识补遗(6) —— Stream">
+<meta name="twitter:description" content="这里的stream指的是java.util.stream包。Stream用于代表任意Java对象的序列，顺序输出任意Java对象实例，并且这个对象实例可能不是预先存在的，而是实时计算出来的。 Stream是惰性计算的，也就是在存储和转换的过程中，并不进行计算，而是存储计算规则。只有最后获取结果的时候才计算（类似Spark中的RDD）。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.afrag.wang/程序开发/Java-knowledge-supplement-6/"/>
+
+
+
+
+
+  <title>我的Java知识补遗(6) —— Stream | 昼夜不过是光阴的门户</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">昼夜不过是光阴的门户</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Afrag键盘的回响</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.afrag.wang/程序开发/Java-knowledge-supplement-6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Afrag Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="昼夜不过是光阴的门户">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">我的Java知识补遗(6) —— Stream</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-09T10:13:08+08:00">
+                2020-03-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/程序开发/" itemprop="url" rel="index">
+                    <span itemprop="name">程序开发</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/程序开发/Java-knowledge-supplement-6/" class="leancloud_visitors" data-flag-title="我的Java知识补遗(6) —— Stream">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,384
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  5
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这里的stream指的是java.util.stream包。Stream用于代表任意Java对象的序列，顺序输出任意Java对象实例，并且这个对象实例可能不是预先存在的，而是实时计算出来的。</p>
+<p>Stream是惰性计算的，也就是在存储和转换的过程中，并不进行计算，而是存储计算规则。只有最后获取结果的时候才计算（类似Spark中的RDD）。<br><a id="more"></a></p>
+<h2 id="6-1-创建stream"><a href="#6-1-创建stream" class="headerlink" title="6.1 创建stream"></a>6.1 创建stream</h2><p>要使用stream，首先要创建stream。<br>创建stream有很多种方法。</p>
+<h3 id="6-1-1-Stream-of"><a href="#6-1-1-Stream-of" class="headerlink" title="6.1.1 Stream.of()"></a>6.1.1 Stream.of()</h3><p>使用Stream.of()静态方法，传入可变参数，就创建了一个元素确定的Stream。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Stream&lt;String&gt; stream = Stream.of(<span class="string">"A"</span>,<span class="string">"B"</span>,<span class="string">"C"</span>,<span class="string">"D"</span>);</span><br><span class="line">stream.foreach(System.out::println);</span><br></pre></td></tr></table></figure></p>
+<p>上面stream.foreach中传入的参数需要符合Consumer接口的accept(T t)方法签名</p>
+<h3 id="6-1-2-基于数组或Collection-："><a href="#6-1-2-基于数组或Collection-：" class="headerlink" title="6.1.2 基于数组或Collection**："></a>6.1.2 基于数组或Collection**：</h3><p>调用Arrays或Collection的stream()方法来生成一个stream。</p>
+<h3 id="6-1-3-基于Supplier"><a href="#6-1-3-基于Supplier" class="headerlink" title="6.1.3 基于Supplier"></a>6.1.3 基于Supplier</h3><p>可以通过Stream.generate()方法来创建一个Stream，该方法要求传入一个Supplier对象。<br>这样生成的Stream会不断的调用Supplier的get方法来获取下一个元素。这种Stream保存的不是元素，而是算法，可以用来表示无限序列。</p>
+<h3 id="6-1-4-其他方法"><a href="#6-1-4-其他方法" class="headerlink" title="6.1.4 其他方法"></a>6.1.4 其他方法</h3><p>其他一些类可以提供一些方法来获得Stream，例如Files类的lines方法，还有正则表达式的splitAsStream方法。</p>
+<p>对于基本类型，Java提供了IntStream，LongStream，DoubleStream。</p>
+<h2 id="6-2-使用map方法"><a href="#6-2-使用map方法" class="headerlink" title="6.2 使用map方法"></a>6.2 使用map方法</h2><p>Stream.map()是Stream常用的一个转换方法，将一个运算规则应用于每一个元素之上，从而得到另外一个元素，这些新的元素则组成一个新的Stream。</p>
+<p>Stream.map()方法接受一个Function接口对象，该对象的定义如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Function</span>&lt;<span class="title">T</span>,<span class="title">R</span>&gt;</span>&#123;</span><br><span class="line">    <span class="function">R <span class="title">apply</span><span class="params">(T t)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="6-3-使用Filter"><a href="#6-3-使用Filter" class="headerlink" title="6.3 使用Filter"></a>6.3 使用Filter</h2><p>Stream.filter()是Stream的另外一个常用转换方法，就是使用指定的条件对Stream中的元素进行过滤，符合条件的元素组成一个新的stream。</p>
+<p>Stream.filter()方法接受的参数类型是Predicate接口对象，该对象的定义为：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Predicate</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">test</span><span class="params">(T t)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="6-4-使用reduce"><a href="#6-4-使用reduce" class="headerlink" title="6.4 使用reduce"></a>6.4 使用reduce</h2><p>Stream.reduce()是一个聚合方法，可以把Stream的所有元素按照聚合函数聚合为一个结果。</p>
+<p>Stream.reduce()方法接受的对象是BinaryOperator接口，它定义了一个apply()方法，负责把上次的结果和本次的元素进行运算，并返回运算的结果。</p>
+<h2 id="6-5-输出为集合"><a href="#6-5-输出为集合" class="headerlink" title="6.5 输出为集合"></a>6.5 输出为集合</h2><p>前面说过了，Stream用于代表任意Java对象的序列。所以，通常我们可以将Stream转换为集合。</p>
+<h3 id="6-5-1-输出为Collection"><a href="#6-5-1-输出为Collection" class="headerlink" title="6.5.1 输出为Collection"></a>6.5.1 输出为Collection</h3><p>可以输出为List。调用Stream.collect()方法，该方法需要传入Collectors.toList()对象。<br>同样的，可以传入Collectors.toSet()来输出为Set。</p>
+<p>输出为Map则有些不同，因为Map中需要key和value，所以在输出为Map的时候，传入的Collectors.toMap()中需要指定两个映射函数，将Stream中的元素分别映射为key和value。</p>
+<h3 id="6-5-2-输出为数组"><a href="#6-5-2-输出为数组" class="headerlink" title="6.5.2 输出为数组"></a>6.5.2 输出为数组</h3><p>要将Stream输出为数组，只需要调用其toArray()方法，并传入数组的“构造方法”就可以了。</p>
+<h3 id="6-5-3-分组输出"><a href="#6-5-3-分组输出" class="headerlink" title="6.5.3 分组输出"></a>6.5.3 分组输出</h3><p>可以将Stream中的元素根据一定的条件分组输出，例如根据首字母分组，或者根据取模后的值分组。例如：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;Integer, List&lt;Integer&gt;&gt; groups =  Stream.of(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">10</span>).collect( Collectors.groupingBy( x -&gt; x % <span class="number">3</span>, Collectors.toList() ) );</span><br><span class="line"></span><br><span class="line"> <span class="keyword">for</span>(Integer key : groups.keySet())&#123;</span><br><span class="line">     System.out.print(<span class="string">"\nMod is "</span> + key + <span class="string">":"</span>);</span><br><span class="line">     <span class="keyword">for</span> (Integer value : groups.get(key))&#123;</span><br><span class="line">         System.out.print(<span class="string">"\t"</span> + value);</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="6-6-Stream的其他转换操作"><a href="#6-6-Stream的其他转换操作" class="headerlink" title="6.6 Stream的其他转换操作"></a>6.6 Stream的其他转换操作</h2><h3 id="6-6-1-排序"><a href="#6-6-1-排序" class="headerlink" title="6.6.1 排序"></a>6.6.1 排序</h3><p>调用Stream.sorted()就可以排序。如果Stream中的元素实现了Comparable接口，则可以不传递任何参数。否则，需要传入Comparator。</p>
+<h3 id="6-6-2-去重"><a href="#6-6-2-去重" class="headerlink" title="6.6.2 去重"></a>6.6.2 去重</h3><p>如果要将Stream中的元素去重，只需要调用Stream.distinct()方法。</p>
+<h3 id="6-6-3-截取"><a href="#6-6-3-截取" class="headerlink" title="6.6.3 截取"></a>6.6.3 截取</h3><p>截取操作通常用于将一个无限的Stream转换为有限的Stream。Stream用于截取的操作包括skip()和limit()。前者用于跳过指定数量的元素，后者用于从头截取指定数量的元素。</p>
+<h3 id="6-6-4-合并"><a href="#6-6-4-合并" class="headerlink" title="6.6.4 合并"></a>6.6.4 合并</h3><p>可以使用Stream的静态方法concat()来将两个Stream合并为一个Stream。第一个Stream在前，第二个Stream在后。</p>
+<h3 id="6-6-5-flatMap"><a href="#6-6-5-flatMap" class="headerlink" title="6.6.5 flatMap"></a>6.6.5 flatMap</h3><p>所谓的flatMap，是将Stream中的每个元素映射为一个Stream，然后将这些Stream合并。这个操作可以用在当Stream中的每个元素都是一个Collection时。</p>
+<h2 id="6-7-其他操作"><a href="#6-7-其他操作" class="headerlink" title="6.7 其他操作"></a>6.7 其他操作</h2><p>除了reduce()和collect()外，还有其他的一些聚合操作：</p>
+<ul>
+<li>count():用于返回元素个数。</li>
+<li>max(Comparator&lt;? super T&gt; cp): 用于找出最大元素</li>
+<li>min(Comparator&lt;? super T&gt; cp): 用于找出最小元素</li>
+</ul>
+<p>对于IntStream，LongStream，DoubleStream，还提供了：</p>
+<ul>
+<li>sum():求和</li>
+<li>average(): 求平均数</li>
+</ul>
+<p>测试Stream中的元素是否满足以下条件：</p>
+<ul>
+<li>allMatch(Predicate&lt;? super T&gt;): 测试是否所有的元素都满足测试条件</li>
+<li>anyMatch(Predicate&lt;? super T&gt;): 测试是否至少有一个元素满足测试条件</li>
+</ul>
+<p>遍历方法：</p>
+<ul>
+<li>forEach()：</li>
+</ul>
+<h2 id="6-8-并行处理"><a href="#6-8-并行处理" class="headerlink" title="6.8 并行处理"></a>6.8 并行处理</h2><p>通常情况下，对Stream的元素的处理是单线程的，一个一个元素的处理。如果希望并行处理，可以将一个普通的Stream转换为可以并行处理的Stream，只需要调用Stream的parallel()就可以了。转换后的Stream的后续操作，只要有可能，都会进行并行处理，不需要我们编写多线程代码。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>如果你觉得这篇文章对你有帮助，请鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/afrag-wang-reward.png" alt="Afrag Wang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.png" alt="Afrag Wang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Afrag Wang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://www.afrag.wang/程序开发/Java-knowledge-supplement-6/" title="我的Java知识补遗(6) —— Stream">http://www.afrag.wang/程序开发/Java-knowledge-supplement-6/</a>
+  </li>
+  
+  
+
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特声明外，均属于作者原创。所有原创文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java14/" rel="tag"># Java14</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/程序开发/Java-knowledge-supplement-5/" rel="next" title="我的Java知识补遗(5) —— 异常处理">
+                <i class="fa fa-chevron-left"></i> 我的Java知识补遗(5) —— 异常处理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/工具/Tools-Git-tutorial/" rel="prev" title="Git教程">
+                Git教程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Afrag Wang</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">20</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#6-1-创建stream"><span class="nav-text">6.1 创建stream</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-1-Stream-of"><span class="nav-text">6.1.1 Stream.of()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-2-基于数组或Collection-："><span class="nav-text">6.1.2 基于数组或Collection**：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-3-基于Supplier"><span class="nav-text">6.1.3 基于Supplier</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-4-其他方法"><span class="nav-text">6.1.4 其他方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-2-使用map方法"><span class="nav-text">6.2 使用map方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-3-使用Filter"><span class="nav-text">6.3 使用Filter</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-4-使用reduce"><span class="nav-text">6.4 使用reduce</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-5-输出为集合"><span class="nav-text">6.5 输出为集合</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-5-1-输出为Collection"><span class="nav-text">6.5.1 输出为Collection</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-5-2-输出为数组"><span class="nav-text">6.5.2 输出为数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-5-3-分组输出"><span class="nav-text">6.5.3 分组输出</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-6-Stream的其他转换操作"><span class="nav-text">6.6 Stream的其他转换操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-6-1-排序"><span class="nav-text">6.6.1 排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-6-2-去重"><span class="nav-text">6.6.2 去重</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-6-3-截取"><span class="nav-text">6.6.3 截取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-6-4-合并"><span class="nav-text">6.6.4 合并</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-6-5-flatMap"><span class="nav-text">6.6.5 flatMap</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-7-其他操作"><span class="nav-text">6.7 其他操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-8-并行处理"><span class="nav-text">6.8 并行处理</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Afrag Wang</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">21.9k</span>
+  
+</div>
+
+
+
+
+
+
+
+
+  <div class="footer-custom">Afrag个人博客</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("vGiChtlnP07wcVG2GfTwcs1L-gzGzoHsz", "INv1WrjzQC8mK5PH17l4RCo3");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
