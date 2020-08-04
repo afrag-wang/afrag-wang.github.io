@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Reactor,Reactive Programming,响应式编程" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Reactor的核心组件是reactor-core，这个组件是基于Java 8的实现Reactive Stream规范的库。 在Reactor中，提供了实现了publisher的可组合的响应式类型，Flux和Mono，同时还为它们提供了丰富的操作。Flux对象表示的是一个包含0..N个项的响应式的序列，Mono对象表示的是一个包含0..1个项的响应式队列。">
+<meta name="keywords" content="Reactor,Reactive Programming,响应式编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Project Reactor教程(2) —— Reactor核心特性">
+<meta property="og:url" content="http://www.afrag.wang/编程技术/Reactor_02_Core_Feature/index.html">
+<meta property="og:site_name" content="昼夜不过是光阴的门户">
+<meta property="og:description" content="Reactor的核心组件是reactor-core，这个组件是基于Java 8的实现Reactive Stream规范的库。 在Reactor中，提供了实现了publisher的可组合的响应式类型，Flux和Mono，同时还为它们提供了丰富的操作。Flux对象表示的是一个包含0..N个项的响应式的序列，Mono对象表示的是一个包含0..1个项的响应式队列。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-04-12T02:03:05.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Project Reactor教程(2) —— Reactor核心特性">
+<meta name="twitter:description" content="Reactor的核心组件是reactor-core，这个组件是基于Java 8的实现Reactive Stream规范的库。 在Reactor中，提供了实现了publisher的可组合的响应式类型，Flux和Mono，同时还为它们提供了丰富的操作。Flux对象表示的是一个包含0..N个项的响应式的序列，Mono对象表示的是一个包含0..1个项的响应式队列。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.afrag.wang/编程技术/Reactor_02_Core_Feature/"/>
+
+
+
+
+
+  <title>Project Reactor教程(2) —— Reactor核心特性 | 昼夜不过是光阴的门户</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">昼夜不过是光阴的门户</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Afrag键盘的回响</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.afrag.wang/编程技术/Reactor_02_Core_Feature/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Afrag Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="昼夜不过是光阴的门户">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Project Reactor教程(2) —— Reactor核心特性</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-12T10:03:05+08:00">
+                2020-04-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/编程技术/" itemprop="url" rel="index">
+                    <span itemprop="name">编程技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/编程技术/Reactor_02_Core_Feature/" class="leancloud_visitors" data-flag-title="Project Reactor教程(2) —— Reactor核心特性">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,697
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  7
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Reactor的核心组件是reactor-core，这个组件是基于Java 8的实现Reactive Stream规范的库。</p>
+<p>在Reactor中，提供了实现了publisher的可组合的响应式类型，Flux和Mono，同时还为它们提供了丰富的操作。Flux对象表示的是一个包含<code>0..N</code>个项的响应式的序列，Mono对象表示的是一个包含<code>0..1</code>个项的响应式队列。</p>
+<a id="more"></a>
+<h2 id="2-1-Flux"><a href="#2-1-Flux" class="headerlink" title="2.1 Flux"></a>2.1 Flux</h2><p><code>Flux&lt;T&gt;</code>是一个标准的<code>Publisher&lt;T&gt;</code>，Flux中可以有0..N个项，或者包含无限多个项直到被erro信号或completion信号终止。 在Reactive Stream规范中，它们会分别触发下游的Subscriber的onNext， onError和onComplete方法。</p>
+<p><code>Flux</code>是一个通用的响应式类型，提供了很多的operator。前面提到的onNext、onError、onComplete都是可选的。只有onComplete表明是一个空的序列，只有onNext表明是一个无限序列。</p>
+<h2 id="2-2-Mono"><a href="#2-2-Mono" class="headerlink" title="2.2 Mono"></a>2.2 Mono</h2><p><code>Mono&lt;T&gt;</code>是一种特殊的<code>Publisher&lt;T&gt;</code>，它最多发送一个项，然后以onComplete或者onError结束。</p>
+<p><code>Mono</code>提供的operator只是flux提供的operator的一个子集。有一些operator会将<code>Mono</code>转换为<code>Flux</code>。</p>
+<h2 id="2-3-创建Flux和Mono"><a href="#2-3-创建Flux和Mono" class="headerlink" title="2.3 创建Flux和Mono"></a>2.3 创建Flux和Mono</h2><p>创建<code>Flux</code>和<code>Mono</code>的最简单的方法就是使用它们提供的工厂方法。例如，要创建一个<code>String</code>序列，可以通过列举的方式<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Flux&lt;String&gt; strSeq = Flux.just(<span class="string">"First"</span>, <span class="string">"Second"</span>, <span class="string">"Third"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>也可以先创建集合，在从集合创建<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">List&lt;String&gt; strList = Array.asList(<span class="string">"First"</span>,<span class="string">"Second"</span>,<span class="string">"Thrid"</span>);</span><br><span class="line">Flux&lt;String&gt; strSeq = Flux.fromIterable(strList);</span><br></pre></td></tr></table></figure></p>
+<p>其他的工厂方法，请查阅相应的文档或者源码。</p>
+<h2 id="2-4-订阅Flux和Mono"><a href="#2-4-订阅Flux和Mono" class="headerlink" title="2.4 订阅Flux和Mono"></a>2.4 订阅Flux和Mono</h2><p>要订阅Flux和Mono，直接在Flux或Mono上使用<code>subscribe</code>方法，该方法有多种变体。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">subscribe();</span><br><span class="line">subscribe(Consumer&lt;? <span class="keyword">super</span> T&gt; consumer);</span><br><span class="line">subscribe(Consumer&lt;? <span class="keyword">super</span> T&gt; consumer,</span><br><span class="line">          Consumer&lt;? suepr Throwable&gt; errorConsumer);</span><br><span class="line">subscribe(Consumer&lt;? <span class="keyword">super</span> T&gt; consumer,</span><br><span class="line">          Consumer&lt;? suepr Throwable&gt; errorConsumer,</span><br><span class="line">          Runnable completeConsumer);</span><br><span class="line">subscribe(Consumer&lt;? <span class="keyword">super</span> T&gt; consumer,</span><br><span class="line">          Consumer&lt;? suepr Throwable&gt; errorConsumer,</span><br><span class="line">          Runnable completeConsumer,</span><br><span class="line">          Consumer&lt;? <span class="keyword">super</span> Subscription&gt; subscriptionConsumer);</span><br></pre></td></tr></table></figure></p>
+<p>通常我们使用这些方法的时候，会结合lambda一起使用。</p>
+<p>下面让我们来看看一些例子。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Flux&lt;Integer&gt; ints = Flux.range(<span class="number">1</span>,<span class="number">3</span>);</span><br><span class="line">ints.subscribe();</span><br></pre></td></tr></table></figure></p>
+<p>上面的代码确实会触发Flux产生3个值，但是实际上没有做任何处理。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Flux&lt;Integer&gt; ints = Flux.range(<span class="number">1</span>,<span class="number">3</span>);</span><br><span class="line">ints.subscribe(i -&gt; System.out.println(i));</span><br></pre></td></tr></table></figure>
+<p>上面的代码中，订阅者会将收到的数据打印出来。</p>
+<p>下面来看看对错误的处理：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Flux&lt;Integer&gt; itns = Flux.range(<span class="number">1</span>,<span class="number">4</span>)</span><br><span class="line">    .map(i -&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (i &lt;= <span class="number">3</span> ) <span class="keyword">return</span> i;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Cannot greater than 3"</span>);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">ints.subscribe(i -&gt; System.out.print(i * i),</span><br><span class="line">    error -&gt; System.err.println(<span class="string">"Error:"</span> + error));</span><br></pre></td></tr></table></figure></p>
+<p>上面的代码中，我们首先生成了一个包含4个数据的Flux，然后通过map方法将其转换为一个新的Flux，新的Flux中包含了3个数据和一个error。<br>在subscribe方法中，我们定义了正常的数据的消费者，也定义了error的消费者。</p>
+<p>下一个subscribe方法是能够处理onComplete的，我们来看看例子：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Flux&lt;Integer&gt; ints = Flux.range(<span class="number">1</span>, <span class="number">4</span>); </span><br><span class="line">ints.subscribe(i -&gt; System.out.println(i),</span><br><span class="line">    error -&gt; System.err.println(<span class="string">"Error "</span> + error),</span><br><span class="line">    () -&gt; System.out.println(<span class="string">"Done"</span>));</span><br></pre></td></tr></table></figure></p>
+<p>其实onError和onComplete只可能出现一个，因此我们在Flux中不能抛出异常。同时，在执行的时候，也只有处理onComplete的lambda被执行。</p>
+<p>最后一个方法签名让我们能够控制每次获取的数据的量。请看下面的代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Flux&lt;Integer&gt; ints = Flux.range(<span class="number">1</span>, <span class="number">11</span>);</span><br><span class="line">ints.subscribe(i -&gt; System.out.println(i * i),</span><br><span class="line">              error -&gt; System.err.println(error),</span><br><span class="line">              () -&gt; System.out.println(<span class="string">"Done"</span>),</span><br><span class="line">              sub -&gt; &#123; sub.request(<span class="number">6</span>); </span><br><span class="line">                        System.out.println(<span class="string">"Next batch!"</span>);</span><br><span class="line">                        sub.request(<span class="number">6</span>);&#125;</span><br><span class="line">            );</span><br></pre></td></tr></table></figure></p>
+<p>这个例子中，我们使用Subscription.request()方法分两批请求数据，每次请求6个数据。这段代码运行的结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">1</span><br><span class="line">4</span><br><span class="line">9</span><br><span class="line">16</span><br><span class="line">25</span><br><span class="line">36</span><br><span class="line">Next batch!</span><br><span class="line">49</span><br><span class="line">64</span><br><span class="line">81</span><br><span class="line">100</span><br><span class="line">121</span><br><span class="line">Done</span><br></pre></td></tr></table></figure>
+<h2 id="2-5-取消订阅"><a href="#2-5-取消订阅" class="headerlink" title="2.5 取消订阅"></a>2.5 取消订阅</h2><p>上一节所有的<code>subscribe</code>方法，返回的都是一个Disposable类型的对象。在这个Disposable对象上，我们可以调用其<code>dispose</code>方法来取消订阅。</p>
+<p>对于Flux或者Mono，取消订阅实际上就是向上游发送取消信号，这个信号是告诉源头不要再生成数据。但是无法保证会立即停止，甚至有可能在收到取消信号之前，所有的数据都已经生成了。</p>
+<h2 id="2-6-使用BaseSubscriber进行订阅"><a href="#2-6-使用BaseSubscriber进行订阅" class="headerlink" title="2.6 使用BaseSubscriber进行订阅"></a>2.6 使用BaseSubscriber进行订阅</h2><p>除了前面的使用lambda做参数的subscribe方法之外，其实还有一种subscribe方法，接受一个BaseSubscriber类型的参数。</p>
+<p>我们可以编写自己的类来扩展BaseSubscriber，实现其中我们需要的钩子方法，例如：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.reactivestreams.Subscription;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> reactor.core.publisher.BaseSubscriber;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SampleSubscriber</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">BaseSubscriber</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">hookOnSubscribe</span><span class="params">(Subscription subscription)</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Request first one"</span>);</span><br><span class="line">		subscription.request(<span class="number">1</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">hookOnNext</span><span class="params">(T value)</span> </span>&#123;</span><br><span class="line">        System.out.println(value);</span><br><span class="line">        System.out.println(<span class="string">"Request next one"</span>);</span><br><span class="line">        request(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">hookOnComplete</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Done"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">hookOnError</span><span class="params">(Throwable throwable)</span> </span>&#123;</span><br><span class="line">        System.err.println(<span class="string">"Error:"</span> + throwable);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后，就可以用这个SampleSubscriber的实例来处理Flux中的数据了，如下例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="keyword">int</span> length = <span class="number">11</span>;</span><br><span class="line">Flux&lt;Integer&gt; ints = Flux.range(<span class="number">1</span>, length);</span><br><span class="line">SampleSubscriber&lt;Integer&gt; ss = <span class="keyword">new</span> SampleSubscriber&lt;Integer&gt;();</span><br><span class="line">ints.subscribe(ss);</span><br></pre></td></tr></table></figure></p>
+<p>使用BaseSubscriber的最大的好处是能够在hookOnSubscribe和hookOnNext中控制每次request的数据量。如同上面的例子中，我们通过在hookOnSubscribe和hookOnNext中分别调用request(1)来控制每次只请求一个数据。</p>
+<p>BaseSubscriber中还提供了其他的钩子函数，例如hookOnCancel，hookFinally。其中hookFinally是始终会在序列结束时被调用的，无论是因为onError结束还是onComplete结束。</p>
+<h2 id="2-7-回压"><a href="#2-7-回压" class="headerlink" title="2.7 回压"></a>2.7 回压</h2><p>在<a href="编程技术/Reactor_01_Introduce/">上一篇文章</a>中，我们提到过回压的定义。在Reactor中，我们是通过向上游的operator传递request来实现的。当前请求的数量和又被称为当前的“要求”（Demand）或“未完成的请求”(Pending Request)。最大的数量是Long.MAX_VALUE，代表无限的请求，也就是让上游的operator有多少发多少，有多快发多快。</p>
+<p>向上游系统发送第一个request信号有多种方式，包括在Flux上调用：</p>
+<ul>
+<li>subscribe()方法的各种变体。</li>
+<li>block(),blockFirst()和blockLast()方法。</li>
+<li>遍历toIterable()或toStream()的结果。</li>
+</ul>
+<p>另外，需要时刻牢记，在subscribe中所请求的数量的“级别”，在向上游传递的过程中可能会被中间的operator修改。最典型的就是buffer(N)这个operator：如果这个operator收到request(2)，它会把它解释为要求两个满的buffer，因此这个operator会将request修改为请求<span style="color:orange">2*N</span>个数据。</p>
+<p>Prefetch是另外一种调整方式。不特殊指定的话，大部分的operator会先获取32个数据。</p>
+<p>通常，operator还会实现replenishing optimization：当operator看到75%的预获取的量已经收到了，那么会再次向上游要求75%的数据。</p>
+<p>还有一些其他的Operator来直接对request进行修改，例如limitRate和limitRequest。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>如果你觉得这篇文章对你有帮助，请鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/afrag-wang-reward.png" alt="Afrag Wang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.png" alt="Afrag Wang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Afrag Wang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://www.afrag.wang/编程技术/Reactor_02_Core_Feature/" title="Project Reactor教程(2) —— Reactor核心特性">http://www.afrag.wang/编程技术/Reactor_02_Core_Feature/</a>
+  </li>
+  
+  
+
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特声明外，均属于作者原创。所有原创文章均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Reactive-Programming/" rel="tag"># Reactive Programming</a>
+          
+            <a href="/tags/响应式编程/" rel="tag"># 响应式编程</a>
+          
+            <a href="/tags/Ractor/" rel="tag"># Ractor</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/编程技术/Reactor_01_Introduce/" rel="next" title="Project Reactor教程(1) —— Reactor简介">
+                <i class="fa fa-chevron-left"></i> Project Reactor教程(1) —— Reactor简介
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Afrag Wang</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-Flux"><span class="nav-text">2.1 Flux</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-Mono"><span class="nav-text">2.2 Mono</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-创建Flux和Mono"><span class="nav-text">2.3 创建Flux和Mono</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-订阅Flux和Mono"><span class="nav-text">2.4 订阅Flux和Mono</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-取消订阅"><span class="nav-text">2.5 取消订阅</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-6-使用BaseSubscriber进行订阅"><span class="nav-text">2.6 使用BaseSubscriber进行订阅</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-7-回压"><span class="nav-text">2.7 回压</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Afrag Wang</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">26.1k</span>
+  
+</div>
+
+
+
+
+
+
+
+
+  <div class="footer-custom">Afrag个人博客</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("vGiChtlnP07wcVG2GfTwcs1L-gzGzoHsz", "INv1WrjzQC8mK5PH17l4RCo3");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
